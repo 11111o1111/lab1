@@ -15,7 +15,11 @@ Matrix::Matrix() : _n(0), _m(0) {
 	}
 }
 
-Matrix::Matrix(int n, int m, double value) : _n(n), _m(m) {
+Matrix::Matrix(int n, int m, double value) {
+	if (n <= 0 || m <= 0)
+		throw(std::logic_error("incorrect dimensions of the matrix"));
+	_n = n;
+	_m = m;
 	_matrix = new double* [_n];
 	for (int i = 0; i < _n; i++) {
 		_matrix[i] = new double[_m];
@@ -171,10 +175,15 @@ Matrix matrix_transformation(const Matrix& obj) {
 		for (int i = 0; i < j; ++i) {
 			if (new_matrix(i, j) != 0) {
 				int k = j;
-				while(new_matrix(k, j) == 0) {
-					++k;
+				if (new_matrix(k, j) == 0) {
+					while (new_matrix(k, j) == 0) {
+						++k;
+					}
+					Matrix temp_arr_3 = Matrix::creating_line(new_matrix, j);
+					Matrix::combining_vector(new_matrix, k, new_matrix, j);
+					Matrix::combining_vector(temp_arr_3, 0, new_matrix, k);
 				}
-				double temp = new_matrix(i, j) / new_matrix(k, j);
+				double temp = new_matrix(i, j) / new_matrix(j, j);
 				Matrix temp_arr_1 = Matrix::creating_line(new_matrix, i);
 				Matrix temp_arr_2 = Matrix::creating_line(new_matrix, j);
 				Matrix result = temp_arr_1 - (temp_arr_2 * temp);
